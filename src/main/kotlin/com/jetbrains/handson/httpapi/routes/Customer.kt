@@ -1,15 +1,18 @@
 package com.jetbrains.handson.httpapi.routes
 
-import com.jetbrains.handson.httpapi.models.Customer
+import com.jetbrains.handson.httpapi.models.NewCustomer
 import io.ktor.routing.*
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import com.jetbrains.handson.httpapi.models.customerStorage
+import com.jetbrains.handson.httpapi.repositories.CustomerRepository
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 
 fun Route.customerRouting() {
+    val repository = CustomerRepository();
     route("/customer") {
         get {
             if (customerStorage.isNotEmpty()) {
@@ -31,9 +34,14 @@ fun Route.customerRouting() {
             call.respond(customer)
         }
         post {
-            val customer = call.receive<Customer>()
-            customerStorage.add(customer)
-            call.respondText("Customer stored correctly", status = HttpStatusCode.Created)
+            val customer = call.receive<NewCustomer>()
+            try {
+                repository.addCustomer(customer)
+                call.respondText("Customer stored correctly", status = HttpStatusCode.Created)
+            }
+            catch (e: ExposedSQLException) {
+                call.respondText(e.message ?: "Error", status = HttpStatusCode.Conflict)
+            }
         }
         delete("{id}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
