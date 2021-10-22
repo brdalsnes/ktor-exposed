@@ -1,7 +1,6 @@
 package com.jetbrains.handson.httpapi
 
-import com.jetbrains.handson.httpapi.routes.customerRouting
-import com.jetbrains.handson.httpapi.routes.orderRouting
+import com.jetbrains.handson.httpapi.routes.*
 import io.ktor.application.Application
 import io.ktor.application.*
 import io.ktor.features.*
@@ -18,5 +17,6 @@ fun Application.module(testing: Boolean = false) {
     routing {
         customerRouting()
         orderRouting()
+        productRouting()
     }
 }

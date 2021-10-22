@@ -1,6 +1,8 @@
 package com.jetbrains.handson.httpapi
 
 import com.jetbrains.handson.httpapi.repositories.CustomerTable
+import com.jetbrains.handson.httpapi.repositories.OrderTable
+import com.jetbrains.handson.httpapi.repositories.ProductTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +22,8 @@ object DatabaseFactory {
         transaction {
             addLogger(StdOutSqlLogger)
             SchemaUtils.create(CustomerTable)
+            SchemaUtils.create(OrderTable)
+            SchemaUtils.create(ProductTable)
         }
     }
     private fun hikari(): HikariDataSource {

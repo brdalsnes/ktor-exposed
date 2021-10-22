@@ -1,35 +1,28 @@
 package com.jetbrains.handson.httpapi.routes
 
+import com.jetbrains.handson.httpapi.models.NewOrder
+import com.jetbrains.handson.httpapi.repositories.OrderRepository
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-val orderStorage: List<Int> = listOf()
-
 fun Route.orderRouting() {
+    val repository = OrderRepository()
     route("/order") {
         get {
-            if (orderStorage.isNotEmpty()) {
-                call.respond(orderStorage)
+            val customers = repository.getAll()
+            if (customers.isNotEmpty()) {
+                call.respond(customers)
+            } else {
+                call.respondText("No customers found", status = HttpStatusCode.NotFound)
             }
         }
-        get("{id}") {
-            val id = call.parameters["id"] ?: return@get call.respondText("Bad Request", status = HttpStatusCode.BadRequest)
-           /*val order = orderStorage.find { it.number == id } ?: return@get call.respondText(
-                "Not Found",
-                status = HttpStatusCode.NotFound
-            )
-            call.respond(order)*/
-        }
-        get("{id}/total") {
-            val id = call.parameters["id"] ?: return@get call.respondText("Bad Request", status = HttpStatusCode.BadRequest)
-            /*val order = orderStorage.find { it.number == id } ?: return@get call.respondText(
-                "Not Found",
-                status = HttpStatusCode.NotFound
-            )
-            val total = order.contents.map { it.price * it.amount }.sum()
-            call.respond(total)*/
+        post {
+            val order = call.receive<NewOrder>()
+            repository.addOrder(order)
+            call.respondText("Order stored correctly", status = HttpStatusCode.Created)
         }
     }
 }

@@ -11,7 +11,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 
 fun Route.customerRouting() {
-    val repository = CustomerRepository();
+    val repository = CustomerRepository()
     route("/customer") {
         get {
             val customers = repository.getAll()
