@@ -7,6 +7,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import com.jetbrains.handson.httpapi.repositories.CustomerRepository
+import com.jetbrains.handson.httpapi.repositories.OrderRepository
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 
@@ -31,6 +32,18 @@ fun Route.customerRouting() {
                     status = HttpStatusCode.NotFound
                 )
             call.respond(customer)
+        }
+        get("{id}/orders") {
+            val id = call.parameters["id"] ?: return@get call.respondText(
+                "Missing or malformed id",
+                status = HttpStatusCode.BadRequest
+            )
+            repository.get(id.toInt()) ?: return@get call.respondText(
+                "No customer with id $id",
+                status = HttpStatusCode.NotFound
+            )
+            val orders = OrderRepository().getCustomerOrders(id.toInt())
+            call.respond(orders)
         }
         post {
             val customer = call.receive<NewCustomer>()

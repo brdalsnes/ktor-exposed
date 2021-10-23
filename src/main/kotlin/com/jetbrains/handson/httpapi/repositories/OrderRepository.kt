@@ -22,6 +22,11 @@ class OrderRepository {
             .map { toOrder(it) }.singleOrNull()
     }
 
+    suspend fun getCustomerOrders(customerId: Int) = dbQuery {
+        OrderTable.select { OrderTable.customerId eq customerId }
+            .map { toOrder(it) }
+    }
+
     suspend fun addOrder(order: NewOrder) {
         dbQuery {
             OrderTable.insert {

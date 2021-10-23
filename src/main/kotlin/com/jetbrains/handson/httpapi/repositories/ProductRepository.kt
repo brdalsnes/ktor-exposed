@@ -4,6 +4,7 @@ import com.jetbrains.handson.httpapi.DatabaseFactory.dbQuery
 import com.jetbrains.handson.httpapi.models.Product
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 
 object ProductTable : Table() {
@@ -16,6 +17,11 @@ class ProductRepository {
     suspend fun getAll() = dbQuery {
         ProductTable.selectAll().map { toProduct(it) }
     }
+
+    suspend fun get(id: Int) = dbQuery {
+        ProductTable.select { ProductTable.id eq id }
+            .map { toProduct(it) }.singleOrNull()
+        }
 
     private fun toProduct(row: ResultRow): Product {
         return Product(
